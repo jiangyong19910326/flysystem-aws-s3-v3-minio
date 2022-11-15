@@ -552,15 +552,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         $result = $this->s3Client->execute($command);
         $visibility = AdapterInterface::VISIBILITY_PRIVATE;
-
-        foreach ($result->get('Grants') as $grant) {
-            if (
-                isset($grant['Grantee']['URI'])
-                && $grant['Grantee']['URI'] === self::PUBLIC_GRANT_URI
-                && $grant['Permission'] === 'READ'
-            ) {
-                $visibility = AdapterInterface::VISIBILITY_PUBLIC;
-                break;
+        if($result->get('Grants'))
+        {
+            foreach ($result->get('Grants') as $grant) {
+                if (
+                    isset($grant['Grantee']['URI'])
+                    && $grant['Grantee']['URI'] === self::PUBLIC_GRANT_URI
+                    && $grant['Permission'] === 'READ'
+                ) {
+                    $visibility = AdapterInterface::VISIBILITY_PUBLIC;
+                    break;
+                }
             }
         }
 
